@@ -44,6 +44,9 @@ const url = require('url');
 // SERVER //
 ////////////
 
+const rawProductData = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const parsedProductData = JSON.parse(rawProductData);
+
 const server = http.createServer((req, res) => {
   const path = req.url;
 
@@ -53,15 +56,10 @@ const server = http.createServer((req, res) => {
     res.end('This is the PRODUCT!');
   } else if (path === '/api') {
 
-    fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-
-      const productData = JSON.parse(data);
-      res.writeHead(200, {
-        'Content-type': 'application/json'
-      });
-      res.end(data);
-
+    res.writeHead(200, {
+      'Content-type': 'application/json'
     });
+    res.end(rawProductData);
 
   } else {
     // res.statusCode = 404;
