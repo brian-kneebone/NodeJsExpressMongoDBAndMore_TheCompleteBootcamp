@@ -45,8 +45,21 @@ const url = require('url');
 ////////////
 
 const server = http.createServer((req, res) => {
-  console.log(req.url);
-  res.end('Hello from the server.');
+  const path = req.url;
+
+  if (path === '/overview') {
+    res.end('This is the OVERVIEW!');
+  } else if (path === '/product') {
+    res.end('This is the PRODUCT!');
+  } else {
+    // res.statusCode = 404;
+    res.writeHead(404, {
+      'Content-type': 'text/html',
+      'my-own-header': 'test metadata'
+    });
+    res.end('<h1>404 Page Not Found!</h1>');
+  }
+
 });
 
 server.listen(8000, '127.0.0.1', () => {
