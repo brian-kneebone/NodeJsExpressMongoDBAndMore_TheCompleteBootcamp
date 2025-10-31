@@ -51,8 +51,8 @@ const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product
 const rawProductData = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const parsedProductData = JSON.parse(rawProductData);
 
-const replaceTemplate = (cardHtmlTemplate, productObject) => {
-  let output = cardHtmlTemplate.replace(/{%NAME%}/g, productObject.productName);
+const replaceTemplate = (htmlTemplate, productObject) => {
+  let output = htmlTemplate.replace(/{%NAME%}/g, productObject.productName);
   output = output.replace(/{%IMAGE%}/g, productObject.image);
   output = output.replace(/{%COUNTRY%}/g, productObject.from);
   output = output.replace(/{%NUTRIENTS%}/g, productObject.nutrients);
@@ -70,10 +70,10 @@ const replaceTemplate = (cardHtmlTemplate, productObject) => {
 }
 
 const server = http.createServer((req, res) => {
-  const path = req.url;
+  const { query , pathname } = url.parse(req.url, true);
 
   // Overview Page
-  if (path === '/' || path === '/overview') {
+  if (pathname === '/' || pathname === '/overview') {
 
     res.writeHead(200, {
       'Content-type': 'text/html'
@@ -85,15 +85,20 @@ const server = http.createServer((req, res) => {
     res.end(output);
 
   // Product Page
-  } else if (path === '/product') {
+  } else if (pathname === '/product') {
     
+    const id = query.id;
+    var thisProductData = parsedProductData[id];
+
+    const output = replaceTemplate(templateProduct, thisProductData);
+
     res.writeHead(200, {
       'Content-type': 'text/html'
     });
-    res.end(templateProduct);
+    res.end(output);
   
   // API
-  } else if (path === '/api') {
+  } else if (pathname === '/api') {
 
     res.writeHead(200, {
       'Content-type': 'application/json'
