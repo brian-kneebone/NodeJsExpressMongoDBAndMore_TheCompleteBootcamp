@@ -44,16 +44,55 @@ const url = require('url');
 // SERVER //
 ////////////
 
+const templateOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
+const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+
 const rawProductData = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const parsedProductData = JSON.parse(rawProductData);
+
+const replaceTemplate = (cardHtmlTemplate, productObject) => {
+  let output = cardHtmlTemplate.replace(/{%NAME%}/g, productObject.productName);
+  output = output.replace(/{%IMAGE%}/g, productObject.image);
+  output = output.replace(/{%COUNTRY%}/g, productObject.from);
+  output = output.replace(/{%NUTRIENTS%}/g, productObject.nutrients);
+  output = output.replace(/{%QUANTITY%}/g, productObject.quantity);
+  output = output.replace(/{%DESCRIPTION%}/g, productObject.description);
+  output = output.replace(/{%PRICE%}/g, productObject.price);
+  output = output.replace(/{%ID%}/g, productObject.id);
+
+  if (!productObject.organic)
+    output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic');
+  else
+    output = output.replace(/{%NOT_ORGANIC%}/g, '');
+
+  return output;
+}
 
 const server = http.createServer((req, res) => {
   const path = req.url;
 
-  if (path === '/overview') {
-    res.end('This is the OVERVIEW!');
+  // Overview Page
+  if (path === '/' || path === '/overview') {
+
+    res.writeHead(200, {
+      'Content-type': 'text/html'
+    });
+
+    const cardsHtml = parsedProductData.map(el => replaceTemplate(templateCard, el)).join('');
+    const output = templateOverview.replace(/{%CARDS%}/g, cardsHtml);
+
+    res.end(output);
+
+  // Product Page
   } else if (path === '/product') {
-    res.end('This is the PRODUCT!');
+    
+    res.writeHead(200, {
+      'Content-type': 'text/html'
+    });
+    res.end(templateProduct);
+  
+  // API
   } else if (path === '/api') {
 
     res.writeHead(200, {
@@ -61,6 +100,7 @@ const server = http.createServer((req, res) => {
     });
     res.end(rawProductData);
 
+  // Not Found
   } else {
     // res.statusCode = 404;
     res.writeHead(404, {
