@@ -60,7 +60,10 @@ const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product
 const rawProductData = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const parsedProductData = JSON.parse(rawProductData);
 
+console.log(slugify('Some Silly Test Slugified', {lower: true}));
 
+const slugs = parsedProductData.map(el => slugify(el.productName, {lower: true}));
+console.log(slugs);
 
 const server = http.createServer((req, res) => {
   const { query , pathname } = url.parse(req.url, true);
