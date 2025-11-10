@@ -1,7 +1,12 @@
+// Built-in depdendencies
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
 
+// Third party node module dependencies
+const slugify = require('slugify');
+
+// My own custom dependency
 const replaceTemplate = require('./modules/replaceTemplate');
 
 // Note - Delete Later: Installed dependencies
